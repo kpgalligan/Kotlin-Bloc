@@ -88,18 +88,22 @@ kotlin {
         val androidTest by getting
 
         if (isMacOsX) {
-            val iosSimulatorArm64Main by getting
-            val iosMain by getting {
+            val iosMain by creating {
                 dependsOn(commonMain)
-                iosSimulatorArm64Main.dependsOn(this)
                 dependencies {
                     implementation("io.ktor:ktor-client-ios:_")
                 }
             }
-            val iosSimulatorArm64Test by getting
-            val iosTest by getting {
+            val iosTest by creating{
                 dependsOn(commonTest)
-                iosSimulatorArm64Test.dependsOn(this)
+            }
+
+            targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().all {
+                val mainSourceSet = compilations.getByName("main").defaultSourceSet
+                val testSourceSet = compilations.getByName("test").defaultSourceSet
+
+                mainSourceSet.dependsOn(iosMain)
+                testSourceSet.dependsOn(iosTest)
             }
         }
     }

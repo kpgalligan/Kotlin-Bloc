@@ -66,13 +66,19 @@ kotlin {
         val androidTest by getting
 
         if (isMacOsX) {
-            val iosMain by getting
-            val iosTest by getting
-            val iosSimulatorArm64Main by getting {
-                dependsOn(iosMain)
+            val iosMain by creating {
+                dependsOn(commonMain)
             }
-            val iosSimulatorArm64Test by getting {
-                dependsOn(iosTest)
+            val iosTest by creating{
+                dependsOn(commonTest)
+            }
+
+            targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().all {
+                val mainSourceSet = compilations.getByName("main").defaultSourceSet
+                val testSourceSet = compilations.getByName("test").defaultSourceSet
+
+                mainSourceSet.dependsOn(iosMain)
+                testSourceSet.dependsOn(iosTest)
             }
         }
     }
